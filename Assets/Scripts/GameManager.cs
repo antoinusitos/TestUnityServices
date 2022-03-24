@@ -30,6 +30,17 @@ public class GameManager : MonoBehaviour
     public Transform lobbiesPanel = null;
     public Button lobbyButton = null;
 
+    public GameObject roleSelectionObject = null;
+    public GameObject serverSelectionObject = null;
+
+    public Text serverNumbers = null;
+
+    public ServerLobby serverLobbyPrefab = null;
+    private ServerLobby currentServer = null;
+
+    public ClientLobby clientLobbyPrefab = null;
+    private ClientLobby currentClient = null;
+
     async void Start()
     {
         // Initialize Unity Services
@@ -89,6 +100,8 @@ public class GameManager : MonoBehaviour
             Debug.Log("Sign in anonymously succeeded !");
 
             lookingText.SetActive(false);
+
+            roleSelectionObject.SetActive(true);
         }
         catch (Exception ex)
         {
@@ -104,9 +117,9 @@ public class GameManager : MonoBehaviour
     {
         Debug.Log("Client Joined !");
 
-        if(localLobby.Players.Count == localLobby.MaxPlayers)
+        if(currentServer != null)
         {
-            Debug.Log("Lobby is full !");
+            currentServer.ReceiveClient(clientId);
         }
     }
 
@@ -114,21 +127,25 @@ public class GameManager : MonoBehaviour
     {
         serverText.SetActive(false);
         clientText.SetActive(true);
+        roleSelectionObject.SetActive(false);
 
         Debug.Log("Looking for a lobby...");
         errorText.text = "Looking for a lobby...";
 
         try
         {
+            serverSelectionObject.gameObject.SetActive(true);
+
             // Looking for a lobby
 
             // Add options to the matchmaking (mode, rank, etc.)
             QuickJoinLobbyOptions options = new QuickJoinLobbyOptions();
 
             QueryResponse query =  await Lobbies.Instance.QueryLobbiesAsync();
-            errorText.text += "\n lobbies available :" + query.Results.Count;
 
-            for(int i = 0; i < query.Results.Count; i++)
+            serverNumbers.text = "Servers available : " + query.Results.Count;
+
+            for (int i = 0; i < query.Results.Count; i++)
             {
                 errorText.text += "\n " + query.Results[i].Id;
             }
@@ -141,17 +158,18 @@ public class GameManager : MonoBehaviour
                 {
                     Button button = Instantiate(lobbyButton, lobbiesPanel);
                     int index = i;
-                    Lobby lobbyTemp = query.Results[index]; 
+                    Lobby lobbyTemp = query.Results[index];
+                    button.GetComponentInChildren<Text>().text = lobbyTemp.Id + "\t" + "(" + (lobbyTemp.Players.Count - 1) + "/" + lobbyTemp.MaxPlayers + ")";
                     button.onClick.AddListener(async delegate
                     {
+                        serverSelectionObject.SetActive(false);
+
                         errorText.text += "\n joining by ID";
 
                         lobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyTemp.Id);
 
                         Debug.Log("Joined lobby: " + lobby.Id);
                         Debug.Log("Lobby Players: " + lobby.Players.Count);
-
-                        errorText.text += "\n Joined lobby";
 
                         // Retrieve the RELAY code previously set in the create match
                         string joinCode = lobby.Data["joinCode"].Value;
@@ -184,6 +202,9 @@ public class GameManager : MonoBehaviour
 
                         // Finally start the client
                         NetworkManager.Singleton.StartClient();
+
+                        currentClient = Instantiate(clientLobbyPrefab);
+                        currentClient.SetLobby(lobby);
                     });
                 }
 
@@ -230,6 +251,9 @@ public class GameManager : MonoBehaviour
 
                 // Finally start the client
                 NetworkManager.Singleton.StartClient();
+
+                currentClient = Instantiate(clientLobbyPrefab);
+                currentClient.SetLobby(lobby);
             }
         }
         catch (LobbyServiceException e)
@@ -245,6 +269,7 @@ public class GameManager : MonoBehaviour
     {
         serverText.SetActive(true);
         clientText.SetActive(false);
+        roleSelectionObject.SetActive(false);
 
         Debug.Log("Creating a new lobby...");
         errorText.text = "Creating a new lobby...";
@@ -275,7 +300,7 @@ public class GameManager : MonoBehaviour
             options.IsPrivate = false;
 
             // Put the JoinCode in the lobby data, visible by every member
-            // Allow to share data between lobbu players (and external too)
+            // Allow to share data between lobby players (and external too)
             options.Data = new Dictionary<string, DataObject>()
             {
                 {
@@ -319,6 +344,9 @@ public class GameManager : MonoBehaviour
             }
 
             NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
+
+            currentServer = Instantiate(serverLobbyPrefab);
+            currentServer.currentLobby = lobby;
 
         }
         catch (LobbyServiceException e)
