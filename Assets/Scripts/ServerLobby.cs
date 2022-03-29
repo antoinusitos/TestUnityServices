@@ -1,23 +1,48 @@
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
-using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ServerLobby : NetworkBehaviour
 {
-    public List<ulong> clients = new List<ulong>();
+    public static ServerLobby instance = null;
 
-    public Lobby currentLobby = null;
+    public List<PlayerState> clients = new List<PlayerState>();
 
-    public void ReceiveClient(ulong clientId)
+    private GameObject panelLobby = null;
+    private Transform panelLobbyPlayer = null;
+
+    public Transform playerLobbyTextPrefab = null;
+
+    private void Awake()
     {
-        Debug.Log("ReceiveClient:" + clientId);
+        instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
 
-        clients.Add(clientId);
+    private void Start()
+    {
+        panelLobby = GameObject.Find("LobbyCanvas");
+        panelLobbyPlayer = panelLobby.transform.GetChild(0);
+        panelLobbyPlayer.gameObject.SetActive(true);
+    }
 
-        if (currentLobby.Players.Count == currentLobby.MaxPlayers)
-        {
-            Debug.Log("Lobby is full !");
-        }
+    public void ReceiveClient(PlayerState arrivingClient)
+    {
+        Transform instance = Instantiate(playerLobbyTextPrefab);
+        instance.GetComponent<Text>().text = arrivingClient.playerName;
+        instance.GetComponent<NetworkObject>().Spawn();
+        instance.SetParent(panelLobbyPlayer);
+
+        clients.Add(arrivingClient);
+
+        StartCoroutine("Travel");
+    }
+
+    private IEnumerator Travel()
+    {
+        yield return new WaitForSeconds(2);
+        NetworkManager.Singleton.SceneManager.LoadScene("Scene2", UnityEngine.SceneManagement.LoadSceneMode.Single);
     }
 }

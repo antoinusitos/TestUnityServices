@@ -1,35 +1,46 @@
+using System.Collections;
 using Unity.Netcode;
-using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ClientLobby : NetworkBehaviour
 {
-    private Lobby localLobby = null;
+    public static ClientLobby instance = null;
 
-    private NetworkClient localClient = null;
+    public PlayerState localPlayerState = null;
+
+    private GameObject panelLobby = null;
+    private Transform panelLobbyPlayer = null;
+
+    public Text playerLobbyTextPrefab = null;
+
+    private void Awake()
+    {
+        instance = this;
+    }
 
     private void Start()
     {
-        localClient = NetworkManager.Singleton.LocalClient;
-        RegisterToServer();
+        panelLobby = GameObject.Find("LobbyCanvas");
+        panelLobbyPlayer = panelLobby.transform.GetChild(0);
+        panelLobbyPlayer.gameObject.SetActive(true);
+
+        StartCoroutine("RequestPlayerList");
     }
 
-    public void SetLobby(Lobby lobby)
+    private IEnumerator RequestPlayerList()
     {
-        localLobby = lobby;
+        yield return new WaitForSeconds(0.5f);
+        FindObjectOfType<PlayerMenu>().RequestPlayerListServerRpc();
     }
 
-    private void RegisterToServer()
+    public void UpdatePlayerList(PlayerState[] playerStates)
     {
-        Debug.Log("RegisterToServer");
-        SendClientToServer_ServerRpc(/*localClient, */localClient.ClientId);
+        for (int i = 0; i < playerStates.Length; i++)
+        {
+            panelLobbyPlayer.GetChild(i).GetComponent<Text>().text = playerStates[i].playerName;
+        }
     }
 
-
-    [ServerRpc]
-    private void SendClientToServer_ServerRpc(/*NetworkClient client, */ulong clientID)
-    {
-        //Debug.Log("Server receive : SendClientToServer");
-        Debug.Log("clientID : " + clientID);
-    }
+    
 }
