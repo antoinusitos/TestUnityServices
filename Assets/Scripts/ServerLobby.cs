@@ -15,6 +15,8 @@ public class ServerLobby : NetworkBehaviour
 
     public Transform playerLobbyTextPrefab = null;
 
+    public bool isGameLaunched = false;
+
     private void Awake()
     {
         instance = this;
@@ -37,12 +39,16 @@ public class ServerLobby : NetworkBehaviour
 
         clients.Add(arrivingClient);
 
-        StartCoroutine("Travel");
+        if(!isGameLaunched)
+        {
+            isGameLaunched = true;
+            StartCoroutine("Travel");
+        }
     }
 
     private IEnumerator Travel()
     {
         yield return new WaitForSeconds(2);
-        NetworkManager.Singleton.SceneManager.LoadScene("Scene2", UnityEngine.SceneManagement.LoadSceneMode.Single);
+        NetworkManager.Singleton.SceneManager.LoadScene("Demo", UnityEngine.SceneManagement.LoadSceneMode.Additive);
     }
 }
