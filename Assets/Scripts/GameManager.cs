@@ -28,6 +28,12 @@ public class GameManager : MonoBehaviour
 
     public InputField playerNameField = null;
 
+    public InputField clientAddressField = null;
+    public InputField clientPortField = null;
+
+    public InputField serverAddressField = null;
+    public InputField serverPortField = null;
+
     private PlayerState sentPlayerState = null;
 
     private ServerLobby serverLobby = null;
@@ -133,6 +139,7 @@ public class GameManager : MonoBehaviour
         errorText.text = "Server Started";
 
         serverLobby = Instantiate(serverLobbyPrefab);
+        gameObject.SetActive(false);
     }
 
     public void FindMatch()
@@ -144,8 +151,8 @@ public class GameManager : MonoBehaviour
         Debug.Log("Looking for a lobby...");
         errorText.text = "Looking for a lobby...";
 
-        NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = "127.0.0.1";
-        NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Port = 7777;
+        NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = clientAddressField.text;
+        NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Port = ushort.Parse(clientPortField.text);
 
         ConnectClient();
     }
@@ -156,6 +163,7 @@ public class GameManager : MonoBehaviour
         {
             Debug.Log("Local Client detected");
             Instantiate(clientLobbyPrefab, GameObject.Find("PlayerMenu(Clone)").transform);
+            gameObject.SetActive(false);
         }
     }
 
@@ -185,8 +193,8 @@ public class GameManager : MonoBehaviour
         errorText.text = "Creating a new lobby...";
 
 
-        NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = "127.0.0.1";
-        NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Port = 7777;
+        NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = serverAddressField.text;
+        NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Port = ushort.Parse(serverPortField.text);
 
         NetworkManager.Singleton.StartServer();
 

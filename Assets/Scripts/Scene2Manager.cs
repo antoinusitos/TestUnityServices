@@ -6,6 +6,8 @@ public class Scene2Manager : NetworkBehaviour
 {
     private void Start()
     {
+        GameObject.Find("LobbyCanvas").SetActive(false);
+        GameObject.Find("DebugCanvas").SetActive(false);
         StartCoroutine("StartingGame");
     }
 
@@ -14,8 +16,7 @@ public class Scene2Manager : NetworkBehaviour
         if (IsServer)
         {
             yield return new WaitForSeconds(2);
-            Debug.Log("Spawning players");
-            FindObjectOfType<PlayerMenu>().SpawnPlayerForClients();
+            FindObjectOfType<PlayerMenu>().SpawnObserverForClients();
         }
     }
 }

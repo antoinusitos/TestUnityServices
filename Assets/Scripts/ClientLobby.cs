@@ -38,6 +38,8 @@ public class ClientLobby : NetworkBehaviour
     {
         for (int i = 0; i < playerStates.Length; i++)
         {
+            if (playerStates[i].clientGUID == ClientPrefs.GetGuid())
+                localPlayerState = playerStates[i];
             panelLobbyPlayer.GetChild(i).GetComponent<Text>().text = playerStates[i].playerName;
         }
     }
