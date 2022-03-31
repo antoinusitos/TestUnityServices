@@ -15,6 +15,9 @@ public class PlayerMovement : NetworkBehaviour
 
     public Animator animator = null;
 
+    public NetworkVariable<float> currentSpeed = new NetworkVariable<float>(NetworkVariableReadPermission.Everyone, 0);
+    public NetworkVariable<float> currentDirection = new NetworkVariable<float>(NetworkVariableReadPermission.Everyone, 0);
+
     private void Start()
     {
         if (!IsOwner)
@@ -30,10 +33,21 @@ public class PlayerMovement : NetworkBehaviour
         characterController = GetComponent<CharacterController>();
     }
 
+    [ServerRpc]
+    private void UpdateSpeedAndDirServerRPC(float s, float d)
+    {
+        currentSpeed.Value = s;
+        currentDirection.Value = d;
+    }
+
     private void Update()
     {
         if (!IsOwner)
+        {
+            animator.SetFloat("Speed", currentSpeed.Value);
+            animator.SetFloat("Direction", currentDirection.Value);
             return;
+        }
 
         if(Input.GetKeyDown(KeyCode.Tab))
         {
@@ -64,6 +78,7 @@ public class PlayerMovement : NetworkBehaviour
             movement += transform.right;
         }
 
+        UpdateSpeedAndDirServerRPC(movement.z, movement.x);
         animator.SetFloat("Speed", movement.z);
         animator.SetFloat("Direction", movement.x);
 
