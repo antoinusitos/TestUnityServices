@@ -1703,6 +1703,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerUI: {fileID: 2817033827035694802}
   weaponData: {fileID: 11400000, guid: 2ee8faf6ecfb42143b2aeb1c92217e6d, type: 2}
+  AnimationReplication: {fileID: 3480568575506018987}
+  animator: {fileID: 5107612348877677761}
 --- !u!114 &-5893585841046804737
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1735,6 +1737,8 @@ MonoBehaviour:
   currentDirection:
     m_InternalValue: 0
   currentLean:
+    m_InternalValue: 0
+  currentReload:
     m_InternalValue: 0
 --- !u!1 &5111005340096624694
 GameObject:

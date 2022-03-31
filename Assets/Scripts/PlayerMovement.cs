@@ -59,6 +59,12 @@ public class PlayerMovement : NetworkBehaviour
                 animator.SetBool("LeanLeft", false);
                 animator.SetBool("LeanRight", false);
             }
+
+            if(animationReplication.currentReload.Value)
+            {
+                animator.SetTrigger("Reload");
+            }
+
             return;
         }
 

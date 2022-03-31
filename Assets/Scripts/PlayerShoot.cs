@@ -13,6 +13,10 @@ public class PlayerShoot : NetworkBehaviour
 
     private bool reloading = false;
 
+    public PlayerAnimationReplication AnimationReplication = null;
+
+    public Animator animator = null;
+
     private void Start()
     {
         if (!IsOwner)
@@ -61,6 +65,8 @@ public class PlayerShoot : NetworkBehaviour
             if (weaponData.currentMagazineSize == 0)
             {
                 reloading = true;
+                animator.SetTrigger("Reload");
+                AnimationReplication.UpdateReload();
             }
         }
     }
