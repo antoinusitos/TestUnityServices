@@ -2,6 +2,8 @@ using Unity.Netcode;
 
 public class PlayerMenu : NetworkBehaviour
 {
+    public PlayerState localPlayerState = null;
+
     private void Start()
     {
         if(IsLocalPlayer)
@@ -17,23 +19,5 @@ public class PlayerMenu : NetworkBehaviour
             gameObject.SetActive(false);
             return;
         }
-    }
-
-    [ServerRpc]
-    public void RequestPlayerListServerRpc()
-    {
-        UpdateClientsPlayerList();
-    }
-  
-
-    private void UpdateClientsPlayerList()
-    {
-        UpdateClientListClientRpc(ServerLobby.instance.clients.ToArray());
-    }
-
-    [ClientRpc]
-    private void UpdateClientListClientRpc(PlayerState[] playerStates)
-    {
-        ClientLobby.instance.UpdatePlayerList(playerStates);
     }
 }

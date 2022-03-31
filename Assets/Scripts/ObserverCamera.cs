@@ -9,6 +9,8 @@ public class ObserverCamera : NetworkBehaviour
 
     public GameObject charSelectionCanvas = null;
 
+    public PlayerInfos playerInfosPrefab = null;
+
     public override void OnGainedOwnership()
     {
         base.OnGainedOwnership();
@@ -66,13 +68,19 @@ public class ObserverCamera : NetworkBehaviour
 
     public void ChoseTeam(int team)
     {
-        ChoseTeamServerRPC(team, FindObjectOfType<ClientLobby>().localPlayerState);
-        FindObjectOfType<PlayerMenu>().gameObject.SetActive(false);
+        ChoseTeamServerRPC(team, PlayerInfos.instance.currentPlayerState);
+
     }
 
     [ServerRpc]
     public void ChoseTeamServerRPC(int team, PlayerState playerState)
     {
         ServerLobby.instance.SpawnPlayerForClient(playerState, team);
+    }
+
+    public void ReceivePlayerState(PlayerState playerState)
+    {
+        PlayerInfos playerInfos = Instantiate(playerInfosPrefab);
+        playerInfos.SetPlayerState(playerState);
     }
 }

@@ -14,6 +14,7 @@ public class ClientLobby : NetworkBehaviour
 
     public Text playerLobbyTextPrefab = null;
 
+
     private void Awake()
     {
         instance = this;
@@ -23,14 +24,6 @@ public class ClientLobby : NetworkBehaviour
     {
         panelLobby = UILinker.instance.panelLobby;
         panelLobbyPlayer = panelLobby.transform.GetChild(0);
-
-        StartCoroutine("RequestPlayerList");
-    }
-
-    private IEnumerator RequestPlayerList()
-    {
-        yield return new WaitForSeconds(0.5f);
-        FindObjectOfType<PlayerMenu>().RequestPlayerListServerRpc();
     }
 
     public void UpdatePlayerList(PlayerState[] playerStates)
@@ -38,7 +31,9 @@ public class ClientLobby : NetworkBehaviour
         for (int i = 0; i < playerStates.Length; i++)
         {
             if (playerStates[i].clientGUID == ClientPrefs.GetGuid())
-                localPlayerState = playerStates[i];
+            {
+                //Show local player in the list
+            }
             panelLobbyPlayer.GetChild(i).GetComponent<Text>().text = playerStates[i].playerName + "\t" + playerStates[i].kills + "\t" + playerStates[i].deaths;
         }
     }

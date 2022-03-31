@@ -24,8 +24,6 @@ public class GameManager : MonoBehaviour
 
     public ServerLobby serverLobbyPrefab = null;
 
-    public ClientLobby clientLobbyPrefab = null;
-
     public InputField playerNameField = null;
 
     public InputField clientAddressField = null;
@@ -43,6 +41,7 @@ public class GameManager : MonoBehaviour
         NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
         NetworkManager.Singleton.OnServerStarted += ServerStartedHandler;
         NetworkManager.Singleton.OnClientConnectedCallback += OnClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += OnClientDisconnected;
 
         // Initialize Unity Services
         await UnityServices.InitializeAsync();
@@ -128,6 +127,7 @@ public class GameManager : MonoBehaviour
 
         if(serverLobby != null)
         {
+            Debug.Log("Receive client :" + clientId);
             connectionPayload.clientID = clientId;
             serverLobby.ReceiveClient(connectionPayload);
         }
@@ -163,8 +163,15 @@ public class GameManager : MonoBehaviour
         if(NetworkManager.Singleton.IsClient && NetworkManager.Singleton.IsConnectedClient)
         {
             Debug.Log("Local Client detected");
-            Instantiate(clientLobbyPrefab, GameObject.Find("PlayerMenu(Clone)").transform);
             gameObject.SetActive(false);
+        }
+    }
+
+    private void OnClientDisconnected(ulong clientID)
+    {
+        if(NetworkManager.Singleton.IsServer)
+        {
+            ServerLobby.instance.ClientLeave(clientID);
         }
     }
 

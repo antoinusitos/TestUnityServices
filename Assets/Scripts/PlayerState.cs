@@ -30,6 +30,7 @@ public class PlayerState : INetworkSerializable
 
     public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
     {
+        serializer.SerializeValue(ref clientID);
         serializer.SerializeValue(ref clientGUID);
         serializer.SerializeValue(ref playerName);
         serializer.SerializeValue(ref deaths);

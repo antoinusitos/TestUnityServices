@@ -1120,6 +1120,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   charSelectionCanvas: {fileID: 10951600}
+  playerInfosPrefab: {fileID: 6371108109111148710, guid: 890fe2dccaf9f48429776cc682b0f3ef, type: 3}
 --- !u!114 &5527835612938505069
 MonoBehaviour:
   m_ObjectHideFlags: 0

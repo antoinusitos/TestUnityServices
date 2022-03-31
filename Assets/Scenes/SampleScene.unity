@@ -932,7 +932,6 @@ MonoBehaviour:
   serverSelectionObject: {fileID: 0}
   serverNumbers: {fileID: 0}
   serverLobbyPrefab: {fileID: 8880825651583600949, guid: 0568aa773e68b06479ef4500e437f592, type: 3}
-  clientLobbyPrefab: {fileID: 5974396648431714848, guid: 81b75e1eaea49834b86dc5197e08028a, type: 3}
   playerNameField: {fileID: 575865456}
   clientAddressField: {fileID: 234219641}
   clientPortField: {fileID: 1706607954}
@@ -4255,11 +4254,6 @@ MonoBehaviour:
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
-      Prefab: {fileID: 8103947770598724340, guid: a01fdb960600c0f488955bda0654207c, type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
       Prefab: {fileID: 5527835612938505068, guid: a9469f867adc5134abf0311900cc6e90, type: 3}
       SourcePrefabToOverride: {fileID: 8115984731914440281, guid: 55598d37f8862204d8bde8c701545287, type: 3}
       SourceHashToOverride: 0
@@ -4274,12 +4268,7 @@ MonoBehaviour:
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 5974396648431714878, guid: 81b75e1eaea49834b86dc5197e08028a, type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    TickRate: 30
+    TickRate: 60
     ClientConnectionBufferTimeout: 10
     ConnectionApproval: 1
     ConnectionData: 

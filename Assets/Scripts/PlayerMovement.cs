@@ -8,8 +8,12 @@ public class PlayerMovement : NetworkBehaviour
 
     private CharacterController characterController = null;
 
-    private float speed = 10;
+    private float speed = 5;
     private float rotationSpeed = 100;
+
+    public PlayerUI playerUI = null;
+
+    public Animator animator = null;
 
     private void Start()
     {
@@ -31,6 +35,15 @@ public class PlayerMovement : NetworkBehaviour
         if (!IsOwner)
             return;
 
+        if(Input.GetKeyDown(KeyCode.Tab))
+        {
+            playerUI.ShowScore(true);
+        }
+        else if (Input.GetKeyUp(KeyCode.Tab))
+        {
+            playerUI.ShowScore(false);
+        }
+
         Vector3 movement = Vector3.zero;
 
         if (Input.GetKey(KeyCode.Z))
@@ -51,6 +64,9 @@ public class PlayerMovement : NetworkBehaviour
             movement += transform.right;
         }
 
+        animator.SetFloat("Speed", movement.z);
+        animator.SetFloat("Direction", movement.x);
+
         characterController.SimpleMove(movement * speed);
 
         float deltaX = Input.GetAxis("Mouse X");
@@ -58,5 +74,11 @@ public class PlayerMovement : NetworkBehaviour
 
         transform.Rotate(Vector3.up * deltaX * Time.deltaTime * rotationSpeed);
         cameraTransform.Rotate(Vector3.right * -deltaY * Time.deltaTime * rotationSpeed);
+    }
+
+    //On Client
+    public void Respawn()
+    {
+        transform.position = Vector3.up;
     }
 }

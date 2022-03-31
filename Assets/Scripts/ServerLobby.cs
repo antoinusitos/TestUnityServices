@@ -4,21 +4,27 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum GameMode
+{
+    FFA,
+    TDM,
+    CTF
+}
+
 public class ServerLobby : NetworkBehaviour
 {
     public static ServerLobby instance = null;
 
     public List<PlayerState> clients = new List<PlayerState>();
 
-    private GameObject panelLobby = null;
-    private Transform panelLobbyPlayer = null;
-
-    public Transform playerLobbyTextPrefab = null;
-
     public GameObject playerPrefab = null;
     public GameObject observerPrefab = null;
 
     public Scene2Manager scene2Manager = null;
+
+    public GameMode gameMode = GameMode.FFA;
+
+    public float timer = 360;
 
     private void Awake()
     {
@@ -31,10 +37,20 @@ public class ServerLobby : NetworkBehaviour
         if (!IsServer)
             return;
 
-        panelLobby = UILinker.instance.panelLobby;
-        panelLobbyPlayer = panelLobby.transform.GetChild(0);
-        panelLobbyPlayer.gameObject.SetActive(true);
         Travel();
+    }
+
+    private void Update()
+    {
+        if (IsServer)
+        {
+            timer -= Time.deltaTime;
+        }
+    }
+
+    public void StartGame()
+    {
+        StartCoroutine("SendScores");
     }
 
     private void Travel()
@@ -50,14 +66,22 @@ public class ServerLobby : NetworkBehaviour
         if (!IsServer)
             return;
 
-        Transform instance = Instantiate(playerLobbyTextPrefab);
-        instance.GetComponent<Text>().text = arrivingClient.playerName;
-        instance.GetComponent<NetworkObject>().Spawn();
-        instance.SetParent(panelLobbyPlayer);
-
         clients.Add(arrivingClient);
 
-        SpawnObserverForClient(arrivingClient.clientID);
+        SpawnObserverForClient(arrivingClient);
+    }
+
+    public void ClientLeave(ulong clientID)
+    {
+        Debug.Log("Client " + clientID + " left the game");
+        for(int i = 0; i < clients.Count; i++)
+        {
+            if(clients[i].clientID == clientID)
+            {
+                clients.RemoveAt(i);
+                return;
+            }
+        }
     }
 
     public void SpawnPlayerForClient(PlayerState playerState, int team)
@@ -67,7 +91,7 @@ public class ServerLobby : NetworkBehaviour
 
         Debug.Log("Spawning Player for " + playerState.clientID);
 
-        PlayerState[] playerStates = ServerLobby.instance.clients.ToArray();
+        PlayerState[] playerStates = clients.ToArray();
         for (int i = 0; i < playerStates.Length; i++)
         {
             if (playerState.clientGUID == playerStates[i].clientGUID)
@@ -82,6 +106,24 @@ public class ServerLobby : NetworkBehaviour
         }
     }
 
+    private IEnumerator SendScores()
+    {
+        WaitForSeconds waitForSeconds = new WaitForSeconds(1);
+        while (true)
+        {
+            yield return waitForSeconds;
+            SendClientTimeClientRpc(clients.ToArray());
+        }
+    }
+
+    [ClientRpc]
+    private void SendClientTimeClientRpc(PlayerState[] playerStates)
+    {
+        PlayerUI playerUI = FindObjectOfType<PlayerUI>();
+        if(playerUI != null)
+            playerUI.UpdatePlayerList(playerStates);
+    }
+
     private IEnumerator SendTime(ulong clientID)
     {
         yield return new WaitForSeconds(0.5f);
@@ -94,7 +136,7 @@ public class ServerLobby : NetworkBehaviour
             }
         };
 
-        SendClientTimeClientRpc(scene2Manager.timer, clientRpcParams);
+        SendClientTimeClientRpc(timer, gameMode, clientRpcParams);
     }
 
     public void SpawnObserverForClients()
@@ -103,14 +145,14 @@ public class ServerLobby : NetworkBehaviour
             return;
 
         Debug.Log("Spawning Observers");
-        PlayerState[] playerStates = ServerLobby.instance.clients.ToArray();
+        PlayerState[] playerStates = clients.ToArray();
         for (int i = 0; i < playerStates.Length; i++)
         {
-            SpawnObserverForClient(playerStates[i].clientID);
+            SpawnObserverForClient(playerStates[i]);
         }
     }
 
-    public void SpawnObserverForClient(ulong clientID)
+    public void SpawnObserverForClient(PlayerState playerState)
     {
         if (!IsServer)
             return;
@@ -118,14 +160,54 @@ public class ServerLobby : NetworkBehaviour
         Debug.Log("Spawning Observer");
         GameObject go = Instantiate(observerPrefab, Vector3.zero, Quaternion.identity);
         go.GetComponent<NetworkObject>().Spawn();
-        go.GetComponent<NetworkObject>().ChangeOwnership(clientID);
+        go.GetComponent<NetworkObject>().ChangeOwnership(playerState.clientID);
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { playerState.clientID }
+            }
+        };
+
+        SendClientPlayerStateClientRpc(playerState, clientRpcParams);
     }
 
     [ClientRpc]
-    private void SendClientTimeClientRpc(float time, ClientRpcParams clientRpcParams = default)
+    private void SendClientTimeClientRpc(float time, GameMode gameMode, ClientRpcParams clientRpcParams = default)
     {
-        if (IsOwner) return;
+        PlayerUI playerUI = FindObjectOfType<PlayerUI>();
+        playerUI.time = time;
+        playerUI.SetGameMode(gameMode);
+    }
 
-        FindObjectOfType<PlayerUI>().time = time;
+    [ClientRpc]
+    private void SendClientPlayerStateClientRpc(PlayerState playerState, ClientRpcParams clientRpcParams = default)
+    {
+        FindObjectOfType<ObserverCamera>().ReceivePlayerState(playerState);
+    }
+
+    public void UpdateKill(ulong clientID)
+    {
+        for(int i = 0; i < clients.Count; i++)
+        {
+            if(clients[i].clientID == clientID)
+            {
+                clients[i].kills++;
+                return;
+            }
+        }
+    }
+
+    public void UpdateDeath(ulong clientID)
+    {
+        for (int i = 0; i < clients.Count; i++)
+        {
+            if (clients[i].clientID == clientID)
+            {
+                clients[i].deaths++;
+                return;
+            }
+        }
     }
 }
