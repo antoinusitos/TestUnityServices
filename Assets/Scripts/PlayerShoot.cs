@@ -18,7 +18,7 @@ public class PlayerShoot : NetworkBehaviour
         if (!IsOwner)
             return;
 
-        cameraPlayer = transform.GetChild(0);
+        cameraPlayer = transform.GetChild(0).GetChild(0);
 
         weaponData.currentMagazineSize = weaponData.magazineSize;
         playerUI.UpdateMagazineSize(weaponData.currentMagazineSize, weaponData.magazineSize);

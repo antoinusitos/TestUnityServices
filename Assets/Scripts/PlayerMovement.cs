@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour
 {
+    private Transform cameraPivot = null;
     private Transform cameraTransform = null;
     private GameObject playerCanvas = null;
 
@@ -15,8 +16,9 @@ public class PlayerMovement : NetworkBehaviour
 
     public Animator animator = null;
 
-    public NetworkVariable<float> currentSpeed = new NetworkVariable<float>(NetworkVariableReadPermission.Everyone, 0);
-    public NetworkVariable<float> currentDirection = new NetworkVariable<float>(NetworkVariableReadPermission.Everyone, 0);
+    public PlayerAnimationReplication animationReplication = null;
+
+    private int leanSide = 0;
 
     private void Start()
     {
@@ -26,26 +28,37 @@ public class PlayerMovement : NetworkBehaviour
         NetworkManager.Singleton.LocalClient.PlayerObject = GetComponent<NetworkObject>();
 
         FindObjectOfType<ObserverCamera>().gameObject.SetActive(false);
-        cameraTransform = transform.GetChild(0);
-        cameraTransform.gameObject.SetActive(true);
+        cameraPivot = transform.GetChild(0);
+        cameraPivot.gameObject.SetActive(true);
+        cameraTransform = cameraPivot.GetChild(0);
         playerCanvas = transform.GetChild(1).gameObject;
         playerCanvas.SetActive(true);
         characterController = GetComponent<CharacterController>();
     }
 
-    [ServerRpc]
-    private void UpdateSpeedAndDirServerRPC(float s, float d)
-    {
-        currentSpeed.Value = s;
-        currentDirection.Value = d;
-    }
 
     private void Update()
     {
         if (!IsOwner)
         {
-            animator.SetFloat("Speed", currentSpeed.Value);
-            animator.SetFloat("Direction", currentDirection.Value);
+            animator.SetFloat("Speed", animationReplication.currentSpeed.Value);
+            animator.SetFloat("Direction", animationReplication.currentDirection.Value);
+
+            if (animationReplication.currentLean.Value == -1)
+            {
+                animator.SetBool("LeanLeft", true);
+                animator.SetBool("LeanRight", false);
+            }
+            else if (animationReplication.currentLean.Value == 1)
+            {
+                animator.SetBool("LeanRight", true);
+                animator.SetBool("LeanLeft", false);
+            }
+            else
+            {
+                animator.SetBool("LeanLeft", false);
+                animator.SetBool("LeanRight", false);
+            }
             return;
         }
 
@@ -57,6 +70,30 @@ public class PlayerMovement : NetworkBehaviour
         {
             playerUI.ShowScore(false);
         }
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            leanSide = -1;
+            animator.SetBool("LeanLeft", true);
+            animator.SetBool("LeanRight", false);
+            cameraPivot.localRotation = Quaternion.Euler(Vector3.forward * 25);
+        }
+        else if (Input.GetKey(KeyCode.E))
+        {
+            leanSide = 1;
+            animator.SetBool("LeanRight", true);
+            animator.SetBool("LeanLeft", false);
+            cameraPivot.localRotation = Quaternion.Euler(Vector3.forward * -25);
+        }
+        else
+        {
+            leanSide = 0;
+            animator.SetBool("LeanLeft", false);
+            animator.SetBool("LeanRight", false);
+            cameraPivot.localRotation = Quaternion.Euler(Vector3.forward * 0);
+        }
+
+        animationReplication.UpdateLean(leanSide);
 
         Vector3 movement = Vector3.zero;
 
@@ -78,7 +115,7 @@ public class PlayerMovement : NetworkBehaviour
             movement += transform.right;
         }
 
-        UpdateSpeedAndDirServerRPC(movement.z, movement.x);
+        animationReplication.UpdateSpeedAndDir(movement.z, movement.x);
         animator.SetFloat("Speed", movement.z);
         animator.SetFloat("Direction", movement.x);
 
