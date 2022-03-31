@@ -1,17 +1,15 @@
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEngine;
 
 public class PlayerMovement : NetworkBehaviour
 {
     private Transform cameraTransform = null;
-
-    private NetworkTransform networkTransform = null;
+    private GameObject playerCanvas = null;
 
     private CharacterController characterController = null;
 
     private float speed = 10;
-    private float rotationSpeed = 50;
+    private float rotationSpeed = 100;
 
     private void Start()
     {
@@ -23,7 +21,8 @@ public class PlayerMovement : NetworkBehaviour
         FindObjectOfType<ObserverCamera>().gameObject.SetActive(false);
         cameraTransform = transform.GetChild(0);
         cameraTransform.gameObject.SetActive(true);
-        networkTransform = GetComponent<NetworkTransform>();
+        playerCanvas = transform.GetChild(1).gameObject;
+        playerCanvas.SetActive(true);
         characterController = GetComponent<CharacterController>();
     }
 
@@ -37,26 +36,22 @@ public class PlayerMovement : NetworkBehaviour
         if (Input.GetKey(KeyCode.Z))
         {
             movement += transform.forward;
-            //transform.position += cameraTransform.forward * Time.deltaTime * speed;
         }
         else if (Input.GetKey(KeyCode.S))
         {
             movement -= transform.forward;
-            //transform.position -= cameraTransform.forward * Time.deltaTime * speed;
         }
 
         if (Input.GetKey(KeyCode.Q))
         {
             movement -= transform.right;
-            //transform.position -= cameraTransform.right * Time.deltaTime * speed;
         }
         else if (Input.GetKey(KeyCode.D))
         {
             movement += transform.right;
-            //transform.position += cameraTransform.right * Time.deltaTime * speed;
         }
 
-        characterController.SimpleMove(movement * 5.0f);
+        characterController.SimpleMove(movement * speed);
 
         float deltaX = Input.GetAxis("Mouse X");
         float deltaY = Input.GetAxis("Mouse Y");

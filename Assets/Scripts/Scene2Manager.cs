@@ -1,22 +1,22 @@
-using System.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
 public class Scene2Manager : NetworkBehaviour
 {
+    public float timer = 360;
+
     private void Start()
     {
-        GameObject.Find("LobbyCanvas").SetActive(false);
-        GameObject.Find("DebugCanvas").SetActive(false);
-        StartCoroutine("StartingGame");
+        UILinker.instance.debugCanvas.SetActive(false);
+        if(IsServer)
+            ServerLobby.instance.scene2Manager = this;
     }
 
-    private IEnumerator StartingGame()
+    private void Update()
     {
-        if (IsServer)
+        if(IsServer)
         {
-            yield return new WaitForSeconds(2);
-            FindObjectOfType<PlayerMenu>().SpawnObserverForClients();
+            timer -= Time.deltaTime;
         }
     }
 }

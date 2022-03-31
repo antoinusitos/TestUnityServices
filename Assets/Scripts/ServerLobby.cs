@@ -15,7 +15,10 @@ public class ServerLobby : NetworkBehaviour
 
     public Transform playerLobbyTextPrefab = null;
 
-    public bool isGameLaunched = false;
+    public GameObject playerPrefab = null;
+    public GameObject observerPrefab = null;
+
+    public Scene2Manager scene2Manager = null;
 
     private void Awake()
     {
@@ -25,13 +28,28 @@ public class ServerLobby : NetworkBehaviour
 
     private void Start()
     {
-        panelLobby = GameObject.Find("LobbyCanvas");
+        if (!IsServer)
+            return;
+
+        panelLobby = UILinker.instance.panelLobby;
         panelLobbyPlayer = panelLobby.transform.GetChild(0);
         panelLobbyPlayer.gameObject.SetActive(true);
+        Travel();
+    }
+
+    private void Travel()
+    {
+        if (!IsServer)
+            return;
+
+        NetworkManager.Singleton.SceneManager.LoadScene("Demo", UnityEngine.SceneManagement.LoadSceneMode.Additive);
     }
 
     public void ReceiveClient(PlayerState arrivingClient)
     {
+        if (!IsServer)
+            return;
+
         Transform instance = Instantiate(playerLobbyTextPrefab);
         instance.GetComponent<Text>().text = arrivingClient.playerName;
         instance.GetComponent<NetworkObject>().Spawn();
@@ -39,16 +57,75 @@ public class ServerLobby : NetworkBehaviour
 
         clients.Add(arrivingClient);
 
-        if(!isGameLaunched)
+        SpawnObserverForClient(arrivingClient.clientID);
+    }
+
+    public void SpawnPlayerForClient(PlayerState playerState, int team)
+    {
+        if (!IsServer)
+            return;
+
+        Debug.Log("Spawning Player for " + playerState.clientID);
+
+        PlayerState[] playerStates = ServerLobby.instance.clients.ToArray();
+        for (int i = 0; i < playerStates.Length; i++)
         {
-            isGameLaunched = true;
-            StartCoroutine("Travel");
+            if (playerState.clientGUID == playerStates[i].clientGUID)
+            {
+                GameObject go = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+                go.GetComponent<NetworkObject>().SpawnAsPlayerObject(playerStates[i].clientID);
+
+                StartCoroutine(SendTime(playerStates[i].clientID));
+
+                break;
+            }
         }
     }
 
-    private IEnumerator Travel()
+    private IEnumerator SendTime(ulong clientID)
     {
-        yield return new WaitForSeconds(2);
-        NetworkManager.Singleton.SceneManager.LoadScene("Demo", UnityEngine.SceneManagement.LoadSceneMode.Additive);
+        yield return new WaitForSeconds(0.5f);
+
+        ClientRpcParams clientRpcParams = new ClientRpcParams
+        {
+            Send = new ClientRpcSendParams
+            {
+                TargetClientIds = new ulong[] { clientID }
+            }
+        };
+
+        SendClientTimeClientRpc(scene2Manager.timer, clientRpcParams);
+    }
+
+    public void SpawnObserverForClients()
+    {
+        if (!IsServer)
+            return;
+
+        Debug.Log("Spawning Observers");
+        PlayerState[] playerStates = ServerLobby.instance.clients.ToArray();
+        for (int i = 0; i < playerStates.Length; i++)
+        {
+            SpawnObserverForClient(playerStates[i].clientID);
+        }
+    }
+
+    public void SpawnObserverForClient(ulong clientID)
+    {
+        if (!IsServer)
+            return;
+
+        Debug.Log("Spawning Observer");
+        GameObject go = Instantiate(observerPrefab, Vector3.zero, Quaternion.identity);
+        go.GetComponent<NetworkObject>().Spawn();
+        go.GetComponent<NetworkObject>().ChangeOwnership(clientID);
+    }
+
+    [ClientRpc]
+    private void SendClientTimeClientRpc(float time, ClientRpcParams clientRpcParams = default)
+    {
+        if (IsOwner) return;
+
+        FindObjectOfType<PlayerUI>().time = time;
     }
 }

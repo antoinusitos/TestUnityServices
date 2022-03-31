@@ -26,6 +26,7 @@ public class ObserverCamera : NetworkBehaviour
     {
         if (!IsOwner)
         {
+            gameObject.SetActive(false);
             return;
         }
 
@@ -65,7 +66,6 @@ public class ObserverCamera : NetworkBehaviour
 
     public void ChoseTeam(int team)
     {
-        Debug.Log("chose team:" + team);
         ChoseTeamServerRPC(team, FindObjectOfType<ClientLobby>().localPlayerState);
         FindObjectOfType<PlayerMenu>().gameObject.SetActive(false);
     }
@@ -73,6 +73,6 @@ public class ObserverCamera : NetworkBehaviour
     [ServerRpc]
     public void ChoseTeamServerRPC(int team, PlayerState playerState)
     {
-        FindObjectOfType<PlayerMenu>().SpawnPlayerForClient(playerState);
+        ServerLobby.instance.SpawnPlayerForClient(playerState, team);
     }
 }

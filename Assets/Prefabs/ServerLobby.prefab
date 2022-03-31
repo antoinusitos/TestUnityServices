@@ -46,6 +46,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   clients: []
   playerLobbyTextPrefab: {fileID: 3005620129780721549, guid: a01fdb960600c0f488955bda0654207c, type: 3}
+  playerPrefab: {fileID: 5110405263079776678, guid: 43a4d865cee5ac8469c731f57c1832b0, type: 3}
+  observerPrefab: {fileID: 5527835612938505068, guid: a9469f867adc5134abf0311900cc6e90, type: 3}
 --- !u!114 &8880825651583600951
 MonoBehaviour:
   m_ObjectHideFlags: 0

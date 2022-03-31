@@ -21,9 +21,8 @@ public class ClientLobby : NetworkBehaviour
 
     private void Start()
     {
-        panelLobby = GameObject.Find("LobbyCanvas");
+        panelLobby = UILinker.instance.panelLobby;
         panelLobbyPlayer = panelLobby.transform.GetChild(0);
-        panelLobbyPlayer.gameObject.SetActive(true);
 
         StartCoroutine("RequestPlayerList");
     }
@@ -40,7 +39,7 @@ public class ClientLobby : NetworkBehaviour
         {
             if (playerStates[i].clientGUID == ClientPrefs.GetGuid())
                 localPlayerState = playerStates[i];
-            panelLobbyPlayer.GetChild(i).GetComponent<Text>().text = playerStates[i].playerName;
+            panelLobbyPlayer.GetChild(i).GetComponent<Text>().text = playerStates[i].playerName + "\t" + playerStates[i].kills + "\t" + playerStates[i].deaths;
         }
     }
 

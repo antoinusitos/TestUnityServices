@@ -139,6 +139,7 @@ public class GameManager : MonoBehaviour
         errorText.text = "Server Started";
 
         serverLobby = Instantiate(serverLobbyPrefab);
+        serverLobby.GetComponent<NetworkObject>().Spawn();
         gameObject.SetActive(false);
     }
 
