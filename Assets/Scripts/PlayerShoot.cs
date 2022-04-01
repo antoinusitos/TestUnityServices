@@ -75,7 +75,6 @@ public class PlayerShoot : NetworkBehaviour
     private void FireServerRPC(Vector3 pos, Vector3 dir, float range, float damage, ulong senderID)
     {
         Debug.DrawRay(pos, dir * range, Color.red, 50);
-        Debug.Log("shoot");
         if (Physics.Raycast(pos, dir * range, out RaycastHit hit))
         {
             PlayerHealth playerHealth = hit.transform.GetComponent<PlayerHealth>();

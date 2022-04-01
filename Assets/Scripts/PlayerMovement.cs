@@ -20,6 +20,10 @@ public class PlayerMovement : NetworkBehaviour
 
     private int leanSide = 0;
 
+    public GameObject playerModel = null;
+
+    private float bodyAngle = 0;
+
     private void Start()
     {
         if (!IsOwner)
@@ -34,6 +38,7 @@ public class PlayerMovement : NetworkBehaviour
         playerCanvas = transform.GetChild(1).gameObject;
         playerCanvas.SetActive(true);
         characterController = GetComponent<CharacterController>();
+        playerModel.SetActive(false);
     }
 
 
@@ -44,21 +49,8 @@ public class PlayerMovement : NetworkBehaviour
             animator.SetFloat("Speed", animationReplication.currentSpeed.Value);
             animator.SetFloat("Direction", animationReplication.currentDirection.Value);
 
-            if (animationReplication.currentLean.Value == -1)
-            {
-                animator.SetBool("LeanLeft", true);
-                animator.SetBool("LeanRight", false);
-            }
-            else if (animationReplication.currentLean.Value == 1)
-            {
-                animator.SetBool("LeanRight", true);
-                animator.SetBool("LeanLeft", false);
-            }
-            else
-            {
-                animator.SetBool("LeanLeft", false);
-                animator.SetBool("LeanRight", false);
-            }
+            animator.SetFloat("LeanSide", animationReplication.currentLean.Value);
+            animator.SetFloat("LookUpAngle", animationReplication.currentbodyAngle.Value);
 
             if(animationReplication.currentReload.Value)
             {
@@ -80,25 +72,20 @@ public class PlayerMovement : NetworkBehaviour
         if (Input.GetKey(KeyCode.A))
         {
             leanSide = -1;
-            animator.SetBool("LeanLeft", true);
-            animator.SetBool("LeanRight", false);
             cameraPivot.localRotation = Quaternion.Euler(Vector3.forward * 25);
         }
         else if (Input.GetKey(KeyCode.E))
         {
             leanSide = 1;
-            animator.SetBool("LeanRight", true);
-            animator.SetBool("LeanLeft", false);
             cameraPivot.localRotation = Quaternion.Euler(Vector3.forward * -25);
         }
         else
         {
             leanSide = 0;
-            animator.SetBool("LeanLeft", false);
-            animator.SetBool("LeanRight", false);
             cameraPivot.localRotation = Quaternion.Euler(Vector3.forward * 0);
         }
 
+        animator.SetFloat("LeanSide", leanSide);
         animationReplication.UpdateLean(leanSide);
 
         Vector3 movement = Vector3.zero;
@@ -130,8 +117,16 @@ public class PlayerMovement : NetworkBehaviour
         float deltaX = Input.GetAxis("Mouse X");
         float deltaY = Input.GetAxis("Mouse Y");
 
+        bodyAngle += -deltaY * Time.deltaTime* rotationSpeed;
+        if (bodyAngle > 89)
+            bodyAngle = 89;
+        else if (bodyAngle < -89)
+            bodyAngle = -89;
+        animationReplication.UpdateBodyAngle(-bodyAngle / 90.0f);
+
         transform.Rotate(Vector3.up * deltaX * Time.deltaTime * rotationSpeed);
         cameraTransform.Rotate(Vector3.right * -deltaY * Time.deltaTime * rotationSpeed);
+        cameraTransform.localRotation = Quaternion.Euler(Vector3.right * bodyAngle);
     }
 
     //On Client

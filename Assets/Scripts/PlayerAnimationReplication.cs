@@ -8,8 +8,11 @@ public class PlayerAnimationReplication : NetworkBehaviour
     public NetworkVariable<float> currentDirection = new NetworkVariable<float>(NetworkVariableReadPermission.Everyone, 0);
     private float dir = 0;
 
-    public NetworkVariable<int> currentLean = new NetworkVariable<int>(NetworkVariableReadPermission.Everyone, 0);
-    private int leanSide = 0;
+    public NetworkVariable<float> currentbodyAngle = new NetworkVariable<float>(NetworkVariableReadPermission.Everyone, 0);
+    private float bodyAngle = 0;
+
+    public NetworkVariable<float> currentLean = new NetworkVariable<float>(NetworkVariableReadPermission.Everyone, 0);
+    private float leanSide = 0;
 
     public NetworkVariable<bool> currentReload = new NetworkVariable<bool>(NetworkVariableReadPermission.Everyone, false);
     private int frameReload = 0;
@@ -57,7 +60,28 @@ public class PlayerAnimationReplication : NetworkBehaviour
         currentDirection.Value = d;
     }
 
-    public void UpdateLean(int lean)
+    public void UpdateBodyAngle(float a)
+    {
+        bool shouldUpdate = false;
+        if (bodyAngle != a)
+        {
+            bodyAngle = a;
+            shouldUpdate = true;
+        }
+
+        if (shouldUpdate)
+        {
+            UpdateBodyAngleServerRPC(bodyAngle);
+        }
+    }
+
+    [ServerRpc]
+    private void UpdateBodyAngleServerRPC(float a)
+    {
+        currentbodyAngle.Value = a;
+    }
+
+    public void UpdateLean(float lean)
     {
         bool shouldUpdate = false;
         if (lean != leanSide)
@@ -73,7 +97,7 @@ public class PlayerAnimationReplication : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void UpdateLeanServerRPC(int lean)
+    private void UpdateLeanServerRPC(float lean)
     {
         currentLean.Value = lean;
     }
