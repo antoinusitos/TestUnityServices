@@ -371,7 +371,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.2
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -1645,7 +1645,6 @@ MonoBehaviour:
   animator: {fileID: 5107612348877677761}
   animationReplication: {fileID: 3480568575506018987}
   playerModel: {fileID: 1966417338652500993}
-  bodyAnglePoint: {fileID: 6931453819773356988}
 --- !u!143 &-3775803828116332781
 CharacterController:
   m_ObjectHideFlags: 0
@@ -3047,11 +3046,6 @@ Transform:
 --- !u!95 &5107612348877677761 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: dd585465ff8c6a249908ac3b35c567e3, type: 3}
-  m_PrefabInstance: {fileID: 1696581588491442512}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &6931453819773356988 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -596147022363520276, guid: dd585465ff8c6a249908ac3b35c567e3, type: 3}
   m_PrefabInstance: {fileID: 1696581588491442512}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8330734748548289454

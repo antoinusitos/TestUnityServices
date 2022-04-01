@@ -10,7 +10,7 @@ public class PlayerMovement : NetworkBehaviour
     private CharacterController characterController = null;
 
     private float speed = 5;
-    private float rotationSpeed = 100;
+    private float rotationSpeed = 150;
 
     public PlayerUI playerUI = null;
 
@@ -28,6 +28,8 @@ public class PlayerMovement : NetworkBehaviour
     {
         if (!IsOwner)
             return;
+
+        Cursor.lockState = CursorLockMode.Locked;
 
         NetworkManager.Singleton.LocalClient.PlayerObject = GetComponent<NetworkObject>();
 
@@ -125,7 +127,7 @@ public class PlayerMovement : NetworkBehaviour
         animationReplication.UpdateBodyAngle(-bodyAngle / 90.0f);
 
         transform.Rotate(Vector3.up * deltaX * Time.deltaTime * rotationSpeed);
-        cameraTransform.Rotate(Vector3.right * -deltaY * Time.deltaTime * rotationSpeed);
+        //cameraTransform.Rotate(Vector3.right * -deltaY * Time.deltaTime * rotationSpeed);
         cameraTransform.localRotation = Quaternion.Euler(Vector3.right * bodyAngle);
     }
 

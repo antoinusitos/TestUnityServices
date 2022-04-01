@@ -26,6 +26,8 @@ public class ServerLobby : NetworkBehaviour
 
     public float timer = 360;
 
+    public string sceneGame = "Scene3";
+
     private void Awake()
     {
         instance = this;
@@ -58,7 +60,7 @@ public class ServerLobby : NetworkBehaviour
         if (!IsServer)
             return;
 
-        NetworkManager.Singleton.SceneManager.LoadScene("Demo", UnityEngine.SceneManagement.LoadSceneMode.Additive);
+        NetworkManager.Singleton.SceneManager.LoadScene(sceneGame, UnityEngine.SceneManagement.LoadSceneMode.Additive);
     }
 
     public void ReceiveClient(PlayerState arrivingClient)
