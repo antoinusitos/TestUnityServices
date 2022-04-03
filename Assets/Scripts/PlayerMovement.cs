@@ -24,13 +24,15 @@ public class PlayerMovement : NetworkBehaviour
 
     private float bodyAngle = 0;
 
+    private Player player = null;
+
     private void Start()
     {
         if (!IsOwner)
             return;
 
         Cursor.lockState = CursorLockMode.Locked;
-
+        player = GetComponent<Player>();
         NetworkManager.Singleton.LocalClient.PlayerObject = GetComponent<NetworkObject>();
 
         FindObjectOfType<ObserverCamera>().gameObject.SetActive(false);
@@ -62,7 +64,12 @@ public class PlayerMovement : NetworkBehaviour
             return;
         }
 
-        if(Input.GetKeyDown(KeyCode.Tab))
+        if (player.GetIsInPause())
+        {
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
             playerUI.ShowScore(true);
         }

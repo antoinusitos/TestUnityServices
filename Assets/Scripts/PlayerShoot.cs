@@ -17,11 +17,14 @@ public class PlayerShoot : NetworkBehaviour
 
     public Animator animator = null;
 
+    private Player player = null;
+
     private void Start()
     {
         if (!IsOwner)
             return;
 
+        player = GetComponent<Player>();
         cameraPlayer = transform.GetChild(0).GetChild(0);
 
         weaponData.currentMagazineSize = weaponData.magazineSize;
@@ -53,6 +56,11 @@ public class PlayerShoot : NetworkBehaviour
                 weaponData.currentMagazineSize = weaponData.magazineSize;
                 playerUI.UpdateMagazineSize(weaponData.currentMagazineSize, weaponData.magazineSize);
             }
+        }
+
+        if(player.GetIsInPause())
+        {
+            return;
         }
 
         if(Input.GetMouseButton(0) && !reloading && canShoot)
