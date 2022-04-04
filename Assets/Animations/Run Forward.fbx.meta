@@ -62,14 +62,14 @@ ModelImporter:
       - time: 0.40059775
         functionName: Step
         data: 
-        objectReferenceParameter: {instanceID: 0}
+        objectReferenceParameter: {fileID: 11500000, guid: 96637ae8850208d45866298a19be4507, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0
       - time: 0.9213757
         functionName: Step
         data: 
-        objectReferenceParameter: {instanceID: 0}
+        objectReferenceParameter: {fileID: 11500000, guid: 96637ae8850208d45866298a19be4507, type: 3}
         floatParameter: 0
         intParameter: 0
         messageOptions: 0

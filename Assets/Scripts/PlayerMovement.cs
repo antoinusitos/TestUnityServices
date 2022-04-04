@@ -10,7 +10,17 @@ public class PlayerMovement : NetworkBehaviour
     private CharacterController characterController = null;
 
     private float speed = 5;
+    private float crouchSpeed = 2.5f;
     private float rotationSpeed = 150;
+
+    private float cameraNormalHeight = 0.7f;
+    private float cameraCrouchHeight = 0.25f;
+
+    private float colliderNormalHeight = 1.7f;
+    private float colliderCrouchHeight = 1.2f;
+
+    private float colliderNormalY = 0;
+    private float colliderCrouchY = -0.25f;
 
     public PlayerUI playerUI = null;
 
@@ -27,6 +37,8 @@ public class PlayerMovement : NetworkBehaviour
     private bool crouch = false;
 	
     private Player player = null;
+
+    private float jumpForce = 5;
 
     private void Start()
     {
@@ -62,6 +74,8 @@ public class PlayerMovement : NetworkBehaviour
             {
                 animator.SetTrigger("Reload");
             }
+
+            animator.SetBool("Crouch", animationReplication.currentCrouch.Value);
 
             return;
         }
@@ -99,12 +113,32 @@ public class PlayerMovement : NetworkBehaviour
         if(Input.GetKeyDown(KeyCode.LeftControl))
         {
             crouch = !crouch;
+            if (crouch)
+            {
+                cameraTransform.localPosition = Vector3.up * cameraCrouchHeight;
+                characterController.height = colliderCrouchHeight;
+                characterController.center = Vector3.up * colliderCrouchY;
+            }
+            else
+            {
+                cameraTransform.localPosition = Vector3.up * cameraNormalHeight;
+                characterController.height = colliderNormalHeight;
+                characterController.center = Vector3.up * colliderNormalY;
+            }
         }
         animator.SetBool("Crouch", crouch);
         animationReplication.UpdateCrouch(crouch);
 
         animator.SetFloat("LeanSide", leanSide);
         animationReplication.UpdateLean(leanSide);
+
+        if(characterController.isGrounded)
+        {
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                characterController.attachedRigidbody.AddForce(Vector3.up * jumpForce);
+            }
+        }
 
         Vector3 movement = Vector3.zero;
 
@@ -130,7 +164,8 @@ public class PlayerMovement : NetworkBehaviour
         animator.SetFloat("Speed", movement.z);
         animator.SetFloat("Direction", movement.x);
 
-        characterController.SimpleMove(movement * speed);
+        float currentSpeed = crouch ? crouchSpeed : speed;
+        characterController.SimpleMove(movement * currentSpeed);
 
         float deltaX = Input.GetAxis("Mouse X");
         float deltaY = Input.GetAxis("Mouse Y");
@@ -143,7 +178,6 @@ public class PlayerMovement : NetworkBehaviour
         animationReplication.UpdateBodyAngle(-bodyAngle / 90.0f);
 
         transform.Rotate(Vector3.up * deltaX * Time.deltaTime * rotationSpeed);
-        //cameraTransform.Rotate(Vector3.right * -deltaY * Time.deltaTime * rotationSpeed);
         cameraTransform.localRotation = Quaternion.Euler(Vector3.right * bodyAngle);
     }
 
