@@ -1,11 +1,11 @@
 # TestUnityServices
 
+To Do List : 
 - jump
-- crouch
-- menu
 - sound
 - game mode
 - prediction
 - team system
 - weapon selection
 - FPS model
+- doors
