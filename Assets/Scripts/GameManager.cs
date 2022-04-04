@@ -174,8 +174,8 @@ public class GameManager : MonoBehaviour
 
     private void OnClientConnected(ulong clientID)
     {
-        Debug.Log("OnClientConnected");
-        StartCoroutine("HandleClientConnected");
+        if(isActiveAndEnabled)
+            StartCoroutine("HandleClientConnected");
     }
 
     private IEnumerator HandleClientConnected()

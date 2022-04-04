@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-using UnityEngine.UI;
 
 public enum GameMode
 {
@@ -70,7 +69,7 @@ public class ServerLobby : NetworkBehaviour
 
         clients.Add(arrivingClient);
 
-        //SpawnObserverForClient(arrivingClient);
+        SpawnObserverForClient(arrivingClient);
     }
 
     public void ClientLeave(ulong clientID)

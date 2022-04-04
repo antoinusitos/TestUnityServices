@@ -50,7 +50,7 @@ MonoBehaviour:
   scene2Manager: {fileID: 0}
   gameMode: 0
   timer: 360
-  sceneGame: EmptyScene
+  sceneGame: Scene3
 --- !u!114 &8880825651583600951
 MonoBehaviour:
   m_ObjectHideFlags: 0

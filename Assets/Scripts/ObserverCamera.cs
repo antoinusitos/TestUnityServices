@@ -81,7 +81,7 @@ public class ObserverCamera : NetworkBehaviour
     public void ReceivePlayerState(PlayerState playerState)
     {
         Debug.Log("Received player state");
-        //PlayerInfos playerInfos = Instantiate(playerInfosPrefab);
-        //playerInfos.SetPlayerState(playerState);
+        PlayerInfos playerInfos = Instantiate(playerInfosPrefab);
+        playerInfos.SetPlayerState(playerState);
     }
 }
