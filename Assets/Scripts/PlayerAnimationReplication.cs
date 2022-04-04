@@ -17,6 +17,9 @@ public class PlayerAnimationReplication : NetworkBehaviour
     public NetworkVariable<bool> currentReload = new NetworkVariable<bool>(NetworkVariableReadPermission.Everyone, false);
     private int frameReload = 0;
 
+    public NetworkVariable<bool> currentCrouch = new NetworkVariable<bool>(NetworkVariableReadPermission.Everyone, false);
+    private bool crouch = false;
+
     private void Update()
     {
         if(IsServer)
@@ -100,6 +103,27 @@ public class PlayerAnimationReplication : NetworkBehaviour
     private void UpdateLeanServerRPC(float lean)
     {
         currentLean.Value = lean;
+    }
+
+    public void UpdateCrouch(bool c)
+    {
+        bool shouldUpdate = false;
+        if (c != crouch)
+        {
+            crouch = c;
+            shouldUpdate = true;
+        }
+
+        if (shouldUpdate)
+        {
+            UpdateCrouchServerRPC(crouch);
+        }
+    }
+
+    [ServerRpc]
+    private void UpdateCrouchServerRPC(bool c)
+    {
+        currentCrouch.Value = c;
     }
 
     public void UpdateReload()

@@ -24,6 +24,8 @@ public class PlayerMovement : NetworkBehaviour
 
     private float bodyAngle = 0;
 
+    private bool crouch = false;
+
     private void Start()
     {
         if (!IsOwner)
@@ -86,6 +88,13 @@ public class PlayerMovement : NetworkBehaviour
             leanSide = 0;
             cameraPivot.localRotation = Quaternion.Euler(Vector3.forward * 0);
         }
+
+        if(Input.GetKeyDown(KeyCode.LeftControl))
+        {
+            crouch = !crouch;
+        }
+        animator.SetBool("Crouch", crouch);
+        animationReplication.UpdateCrouch(crouch);
 
         animator.SetFloat("LeanSide", leanSide);
         animationReplication.UpdateLean(leanSide);
