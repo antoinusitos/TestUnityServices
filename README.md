@@ -2,10 +2,12 @@
 
 To Do List : 
 - jump
-- sound
+- sounds
 - game mode
 - prediction
-- team system
+- team system (shoot, respawn)
+- respawn on points
 - weapon selection
-- FPS model
+- FPS model and anims
 - doors
+- died cam on teammate
