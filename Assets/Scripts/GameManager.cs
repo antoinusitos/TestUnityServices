@@ -14,17 +14,11 @@ public class GameManager : MonoBehaviour
     public GameObject serverText = null;
     public GameObject clientText = null;
 
-    public Transform lobbiesPanel = null;
     public Button lobbyButton = null;
 
     public GameObject roleSelectionObject = null;
-    public GameObject serverSelectionObject = null;
-
-    public Text serverNumbers = null;
 
     public ServerLobby serverLobbyPrefab = null;
-
-    public InputField playerNameField = null;
 
     public InputField clientAddressField = null;
     public InputField clientPortField = null;
@@ -35,6 +29,12 @@ public class GameManager : MonoBehaviour
     private PlayerState sentPlayerState = null;
 
     private ServerLobby serverLobby = null;
+
+    public MainMenu mainMenuObject = null;
+
+    private bool canCreateLobby = false;
+    public Text createLobbyErrorText = null;
+    public Text joinLobbyErrorText = null;
 
     async void Start()
     {
@@ -117,6 +117,7 @@ public class GameManager : MonoBehaviour
     {
         if (clientId == NetworkManager.Singleton.LocalClientId)
         {
+            Debug.Log("Server Approval");
             return;
         }
 
@@ -135,6 +136,9 @@ public class GameManager : MonoBehaviour
 
     private void ServerStartedHandler()
     {
+        if (!canCreateLobby)
+            return;
+
         Debug.Log("Server Started");
         errorText.text = "Server Started";
 
@@ -151,6 +155,8 @@ public class GameManager : MonoBehaviour
 
         Debug.Log("Looking for a lobby...");
         errorText.text = "Looking for a lobby...";
+
+        joinLobbyErrorText.text = "";
 
         NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = clientAddressField.text;
         NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Port = ushort.Parse(clientPortField.text);
@@ -180,7 +186,7 @@ public class GameManager : MonoBehaviour
         Debug.Log("Connecting Client");
 
         var clientGuid = ClientPrefs.GetGuid();
-        sentPlayerState = new PlayerState(0, clientGuid, playerNameField.text);
+        sentPlayerState = new PlayerState(0, clientGuid, PlayerPrefs.GetString("PlayerName"));
         
         string payload = JsonUtility.ToJson(sentPlayerState);
         byte[] payloadBytes = System.Text.Encoding.UTF8.GetBytes(payload);
@@ -188,24 +194,46 @@ public class GameManager : MonoBehaviour
         NetworkManager.Singleton.NetworkConfig.ConnectionData = payloadBytes;
 
         // Finally start the client
-        NetworkManager.Singleton.StartClient();
+        canCreateLobby = NetworkManager.Singleton.StartClient();
+
+        if(canCreateLobby)
+        {
+            Debug.Log("joining");
+            mainMenuObject.gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.Log("Cannot create Lobby");
+            errorText.text = "Cannot create Lobby";
+            joinLobbyErrorText.text = "Cannot Create lobby, check your Server Address or Port";
+        }
     }
 
     private void CreateMatch()
     {
-        serverText.SetActive(true);
-        clientText.SetActive(false);
-        roleSelectionObject.SetActive(false);
-
         Debug.Log("Creating a new lobby...");
         errorText.text = "Creating a new lobby...";
 
+        createLobbyErrorText.text = "";
 
         NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Address = serverAddressField.text;
         NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.Port = ushort.Parse(serverPortField.text);
 
-        NetworkManager.Singleton.StartServer();
+        canCreateLobby = NetworkManager.Singleton.StartServer();
 
+        if (canCreateLobby)
+        {
+            mainMenuObject.gameObject.SetActive(false);
+            serverText.SetActive(true);
+            clientText.SetActive(false);
+            roleSelectionObject.SetActive(false);
+        }
+        else
+        {
+            Debug.Log("Cannot create Lobby");
+            errorText.text = "Cannot create Lobby";
+            createLobbyErrorText.text = "Cannot Create lobby, check your Server Address or Port";
+        }
     }
 
     private void OnDestroy()
