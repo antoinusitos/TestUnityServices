@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Services.Authentication;
@@ -136,15 +137,22 @@ public class GameManager : MonoBehaviour
 
     private void ServerStartedHandler()
     {
-        if (!canCreateLobby)
-            return;
+        StartCoroutine("HandleServerStarted");
+    }
 
-        Debug.Log("Server Started");
-        errorText.text = "Server Started";
+    private IEnumerator HandleServerStarted()
+    {
+        yield return new WaitForSeconds(1);
 
-        serverLobby = Instantiate(serverLobbyPrefab);
-        serverLobby.GetComponent<NetworkObject>().Spawn();
-        gameObject.SetActive(false);
+        if (canCreateLobby)
+        {
+            Debug.Log("Server Started");
+            errorText.text = "Server Started";
+
+            serverLobby = Instantiate(serverLobbyPrefab);
+            serverLobby.GetComponent<NetworkObject>().Spawn();
+            gameObject.SetActive(false);
+        }
     }
 
     public void FindMatch()
@@ -166,7 +174,14 @@ public class GameManager : MonoBehaviour
 
     private void OnClientConnected(ulong clientID)
     {
-        if(NetworkManager.Singleton.IsClient && NetworkManager.Singleton.IsConnectedClient)
+        Debug.Log("OnClientConnected");
+        StartCoroutine("HandleClientConnected");
+    }
+
+    private IEnumerator HandleClientConnected()
+    {
+        yield return new WaitForSeconds(1);
+        if (NetworkManager.Singleton.IsClient && NetworkManager.Singleton.IsConnectedClient)
         {
             Debug.Log("Local Client detected");
             gameObject.SetActive(false);
@@ -223,6 +238,7 @@ public class GameManager : MonoBehaviour
 
         if (canCreateLobby)
         {
+            Debug.Log("Lobby created");
             mainMenuObject.gameObject.SetActive(false);
             serverText.SetActive(true);
             clientText.SetActive(false);

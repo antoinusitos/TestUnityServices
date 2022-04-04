@@ -70,7 +70,7 @@ public class ServerLobby : NetworkBehaviour
 
         clients.Add(arrivingClient);
 
-        SpawnObserverForClient(arrivingClient);
+        //SpawnObserverForClient(arrivingClient);
     }
 
     public void ClientLeave(ulong clientID)

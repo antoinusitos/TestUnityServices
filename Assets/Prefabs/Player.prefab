@@ -2229,6 +2229,8 @@ MonoBehaviour:
     m_InternalValue: 0
   currentReload:
     m_InternalValue: 0
+  currentCrouch:
+    m_InternalValue: 0
 --- !u!114 &7497784280983116160
 MonoBehaviour:
   m_ObjectHideFlags: 0
