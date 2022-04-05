@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6f7131e92e95423439eb0eff99c853f5, type: 3}
-  m_Name: MP40
+  m_Name: Karabiner98
   m_EditorClassIdentifier: 
-  weaponName: MP 40
-  fireRate: 11.6
+  weaponName: Karabiner 98
+  fireRate: 8.3
   currentRate: 0
-  damage: 25
-  headMultiplier: 1.5
-  magazineSize: 32
+  damage: 75
+  headMultiplier: 2
+  magazineSize: 5
   currentMagazineSize: 32
-  ammoPossible: 300
+  ammoPossible: 200
   reloadTime: 3
   currentReloadTime: 0
-  range: 500
+  range: 1000
   isSniper: 0

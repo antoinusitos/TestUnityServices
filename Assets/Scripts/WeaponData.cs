@@ -7,6 +7,7 @@ public class WeaponData : ScriptableObject
     // auto slow = 4, sniper = 0.4f
     // let's do the mp40
     // https://medalofhonor.fandom.com/wiki/MP40
+    public string weaponName = "";
     public float fireRate = 11.6f;
     [HideInInspector]
     public float currentRate = 0;
@@ -15,8 +16,24 @@ public class WeaponData : ScriptableObject
     public int magazineSize = 32;
     [HideInInspector]
     public int currentMagazineSize = 32;
+    public int ammoPossible = 32;
     public float reloadTime = 3;
     [HideInInspector]
     public float currentReloadTime = 0;
     public float range = 500;
+    public bool isSniper = false;
+
+    public WeaponData(ref WeaponData reference)
+    {
+        weaponName = reference.weaponName;
+        fireRate = reference.fireRate;
+        currentRate = reference.currentRate;
+        damage = reference.damage;
+        headMultiplier = reference.headMultiplier;
+        magazineSize = reference.magazineSize;
+        ammoPossible = reference.ammoPossible;
+        reloadTime = reference.reloadTime;
+        range = reference.range;
+        isSniper = reference.isSniper;
+    }
 }

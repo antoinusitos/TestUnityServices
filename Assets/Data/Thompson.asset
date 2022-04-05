@@ -10,17 +10,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6f7131e92e95423439eb0eff99c853f5, type: 3}
-  m_Name: MP40
+  m_Name: Thompson
   m_EditorClassIdentifier: 
-  weaponName: MP 40
+  weaponName: Thompson
   fireRate: 11.6
   currentRate: 0
   damage: 25
-  headMultiplier: 1.5
-  magazineSize: 32
+  headMultiplier: 2
+  magazineSize: 30
   currentMagazineSize: 32
   ammoPossible: 300
-  reloadTime: 3
+  reloadTime: 2.5
   currentReloadTime: 0
   range: 500
   isSniper: 0

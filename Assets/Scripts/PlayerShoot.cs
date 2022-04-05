@@ -27,8 +27,10 @@ public class PlayerShoot : NetworkBehaviour
         player = GetComponent<Player>();
         cameraPlayer = transform.GetChild(0).GetChild(0);
 
+        weaponData = PlayerInfos.instance.currentPlayerState.weaponData;
+
         weaponData.currentMagazineSize = weaponData.magazineSize;
-        playerUI.UpdateMagazineSize(weaponData.currentMagazineSize, weaponData.magazineSize);
+        playerUI.UpdateMagazineSize(weaponData.currentMagazineSize, weaponData.ammoPossible);
     }
 
     private void Update()
@@ -53,8 +55,10 @@ public class PlayerShoot : NetworkBehaviour
             {
                 weaponData.currentReloadTime = 0;
                 reloading = false;
-                weaponData.currentMagazineSize = weaponData.magazineSize;
-                playerUI.UpdateMagazineSize(weaponData.currentMagazineSize, weaponData.magazineSize);
+                int ammoToGet = weaponData.magazineSize < weaponData.ammoPossible ? weaponData.magazineSize : weaponData.ammoPossible;
+                weaponData.ammoPossible -= ammoToGet;
+                weaponData.currentMagazineSize = ammoToGet;
+                playerUI.UpdateMagazineSize(weaponData.currentMagazineSize, weaponData.ammoPossible);
             }
         }
 
@@ -66,7 +70,7 @@ public class PlayerShoot : NetworkBehaviour
         if(Input.GetMouseButton(0) && !reloading && canShoot)
         {
             weaponData.currentMagazineSize--;
-            playerUI.UpdateMagazineSize(weaponData.currentMagazineSize, weaponData.magazineSize);
+            playerUI.UpdateMagazineSize(weaponData.currentMagazineSize, weaponData.ammoPossible);
             canShoot = false;
             FireServerRPC(cameraPlayer.position, cameraPlayer.forward, weaponData.range, weaponData.damage, OwnerClientId);
 

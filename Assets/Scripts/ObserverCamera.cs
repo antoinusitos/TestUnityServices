@@ -68,14 +68,19 @@ public class ObserverCamera : NetworkBehaviour
 
     public void ChoseTeam(int team)
     {
-        ChoseTeamServerRPC(team, PlayerInfos.instance.currentPlayerState);
+        PlayerInfos.instance.currentPlayerState.team = team;
+        //ChoseTeamServerRPC(team, PlayerInfos.instance.currentPlayerState);
+    }
 
+    public void ReadyToSpawn()
+    {
+        ChoseTeamServerRPC(PlayerInfos.instance.currentPlayerState);
     }
 
     [ServerRpc]
-    public void ChoseTeamServerRPC(int team, PlayerState playerState)
+    public void ChoseTeamServerRPC(PlayerState playerState)
     {
-        ServerLobby.instance.SpawnPlayerForClient(playerState, team);
+        ServerLobby.instance.SpawnPlayerForClient(playerState);
     }
 
     public void ReceivePlayerState(PlayerState playerState)

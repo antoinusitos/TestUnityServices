@@ -85,7 +85,7 @@ public class ServerLobby : NetworkBehaviour
         }
     }
 
-    public void SpawnPlayerForClient(PlayerState playerState, int team)
+    public void SpawnPlayerForClient(PlayerState playerState)
     {
         if (!IsServer)
             return;
