@@ -40,6 +40,8 @@ public class PlayerMovement : NetworkBehaviour
 
     private float jumpForce = 5;
 
+    private RespawnPoint[] respawnPoints = null;
+
     private void Start()
     {
         if (!IsOwner)
@@ -57,6 +59,10 @@ public class PlayerMovement : NetworkBehaviour
         playerCanvas.SetActive(true);
         characterController = GetComponent<CharacterController>();
         playerModel.SetActive(false);
+
+        respawnPoints = FindObjectsOfType<RespawnPoint>();
+
+        Respawn();
     }
 
 
@@ -184,6 +190,24 @@ public class PlayerMovement : NetworkBehaviour
     //On Client
     public void Respawn()
     {
-        transform.position = Vector3.up;
+        characterController.enabled = false;
+
+        if (PlayerInfos.instance.currentPlayerState.team != 0)
+        {
+            for (int i = 0; i < respawnPoints.Length; i++)
+            {
+                if (respawnPoints[i].team == PlayerInfos.instance.currentPlayerState.team)
+                {
+                    transform.SetPositionAndRotation(respawnPoints[i].transform.position, respawnPoints[i].transform.rotation);
+                    characterController.enabled = true;
+                    return;
+                }
+            }
+        }
+
+        //if we didn't find any spawn point
+        int rand = Random.Range(0, respawnPoints.Length);
+        transform.SetPositionAndRotation(respawnPoints[rand].transform.position, respawnPoints[rand].transform.rotation);
+        characterController.enabled = true;
     }
 }

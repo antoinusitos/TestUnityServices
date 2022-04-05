@@ -97,7 +97,7 @@ public class ServerLobby : NetworkBehaviour
         {
             if (playerState.clientGUID == playerStates[i].clientGUID)
             {
-                GameObject go = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+                GameObject go = Instantiate(playerPrefab, Vector3.up * -50, Quaternion.identity);
                 go.GetComponent<NetworkObject>().SpawnAsPlayerObject(playerStates[i].clientID);
 
                 StartCoroutine(SendTime(playerStates[i].clientID));
