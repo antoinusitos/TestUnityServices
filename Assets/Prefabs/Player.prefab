@@ -132,6 +132,9 @@ MonoBehaviour:
   scorePanel: {fileID: 4645741693284482412}
   panelLobbyPlayer: {fileID: 1102819993315124640}
   scoreTextPrefab: {fileID: 2670869100070126450, guid: a5d393aaab09c054793e36e13874b0e4, type: 3}
+  team1Sprite: {fileID: 21300000, guid: b2f3b95220ffb61409b2f54e174234ef, type: 3}
+  team2Sprite: {fileID: 21300000, guid: 904583a82013cb04f80771448869653d, type: 3}
+  teamSprite: {fileID: 6076057077233525353}
 --- !u!1 &1369836849725663170
 GameObject:
   m_ObjectHideFlags: 0

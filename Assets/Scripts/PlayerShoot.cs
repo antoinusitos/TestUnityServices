@@ -72,7 +72,7 @@ public class PlayerShoot : NetworkBehaviour
             weaponData.currentMagazineSize--;
             playerUI.UpdateMagazineSize(weaponData.currentMagazineSize, weaponData.ammoPossible);
             canShoot = false;
-            FireServerRPC(cameraPlayer.position, cameraPlayer.forward, weaponData.range, weaponData.damage, OwnerClientId);
+            FireServerRPC(cameraPlayer.position, cameraPlayer.forward, weaponData.range, weaponData.damage, OwnerClientId, PlayerInfos.instance.currentPlayerState.team);
 
             if (weaponData.currentMagazineSize == 0)
             {
@@ -84,7 +84,7 @@ public class PlayerShoot : NetworkBehaviour
     }
 
     [ServerRpc]
-    private void FireServerRPC(Vector3 pos, Vector3 dir, float range, float damage, ulong senderID)
+    private void FireServerRPC(Vector3 pos, Vector3 dir, float range, float damage, ulong senderID, int playerTeam)
     {
         Debug.DrawRay(pos, dir * range, Color.red, 50);
         if (Physics.Raycast(pos, dir * range, out RaycastHit hit))
@@ -92,7 +92,23 @@ public class PlayerShoot : NetworkBehaviour
             PlayerHealth playerHealth = hit.transform.GetComponent<PlayerHealth>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(damage, playerHealth.OwnerClientId, senderID);
+                if(playerTeam == 0)
+                    playerHealth.TakeDamage(damage, playerHealth.OwnerClientId, senderID);
+                else
+                {
+                    PlayerState[] states = ServerLobby.instance.clients.ToArray();
+                    for(int i = 0; i < states.Length; i++)
+                    {
+                        if (states[i].clientID == playerHealth.OwnerClientId)
+                        {
+                            if(playerTeam != states[i].team)
+                            {
+                                playerHealth.TakeDamage(damage, playerHealth.OwnerClientId, senderID);
+                            }
+                            break;
+                        }
+                    }
+                }
             }
         }
     }

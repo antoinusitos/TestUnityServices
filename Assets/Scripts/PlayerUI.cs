@@ -17,6 +17,19 @@ public class PlayerUI : MonoBehaviour
     public Transform panelLobbyPlayer = null;
     public Transform scoreTextPrefab = null;
 
+    public Sprite team1Sprite = null;
+    public Sprite team2Sprite = null;
+
+    public Image teamSprite = null;
+
+    private void Start()
+    {
+        if (PlayerInfos.instance.currentPlayerState.team == 1)
+            teamSprite.sprite = team1Sprite;
+        else
+            teamSprite.sprite = team2Sprite;
+    }
+
     private void Update()
     {
         time -= Time.deltaTime;
