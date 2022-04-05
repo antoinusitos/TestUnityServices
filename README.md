@@ -7,7 +7,7 @@ To Do List :
 - prediction
 - team system (shoot, respawn)
 - respawn on points
-- weapon selection
 - FPS model and anims
 - doors
 - died cam on teammate
+- died cam
