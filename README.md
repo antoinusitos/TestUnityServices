@@ -5,7 +5,6 @@ To Do List :
 - sounds
 - game mode
 - prediction
-- FPS model and anims
 - doors
 - died cam on teammate
 - died cam
