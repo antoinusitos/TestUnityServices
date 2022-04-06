@@ -25,6 +25,7 @@ public class PlayerMovement : NetworkBehaviour
     public PlayerUI playerUI = null;
 
     public Animator animator = null;
+    public Animator fpsAnimator = null;
 
     public PlayerAnimationReplication animationReplication = null;
 
@@ -41,6 +42,8 @@ public class PlayerMovement : NetworkBehaviour
     private float jumpForce = 5;
 
     private RespawnPoint[] respawnPoints = null;
+
+    private bool canMoveCam = true;
 
     private void Start()
     {
@@ -132,10 +135,9 @@ public class PlayerMovement : NetworkBehaviour
                 characterController.center = Vector3.up * colliderNormalY;
             }
         }
-        animator.SetBool("Crouch", crouch);
         animationReplication.UpdateCrouch(crouch);
 
-        animator.SetFloat("LeanSide", leanSide);
+        fpsAnimator.SetFloat("LeanSide", leanSide);
         animationReplication.UpdateLean(leanSide);
 
         if(characterController.isGrounded)
@@ -167,24 +169,32 @@ public class PlayerMovement : NetworkBehaviour
         }
 
         animationReplication.UpdateSpeedAndDir(movement.z, movement.x);
-        animator.SetFloat("Speed", movement.z);
-        animator.SetFloat("Direction", movement.x);
+        fpsAnimator.SetFloat("Speed", movement.z);
+        fpsAnimator.SetFloat("Direction", movement.x);
 
         float currentSpeed = crouch ? crouchSpeed : speed;
         characterController.SimpleMove(movement * currentSpeed);
 
-        float deltaX = Input.GetAxis("Mouse X");
-        float deltaY = Input.GetAxis("Mouse Y");
+        if (canMoveCam)
+        {
+            float deltaX = Input.GetAxis("Mouse X");
+            float deltaY = Input.GetAxis("Mouse Y");
 
-        bodyAngle += -deltaY * Time.deltaTime* rotationSpeed;
-        if (bodyAngle > 89)
-            bodyAngle = 89;
-        else if (bodyAngle < -89)
-            bodyAngle = -89;
-        animationReplication.UpdateBodyAngle(-bodyAngle / 90.0f);
+            bodyAngle += -deltaY * Time.deltaTime * rotationSpeed;
+            if (bodyAngle > 89)
+                bodyAngle = 89;
+            else if (bodyAngle < -89)
+                bodyAngle = -89;
+            animationReplication.UpdateBodyAngle(-bodyAngle / 90.0f);
 
-        transform.Rotate(Vector3.up * deltaX * Time.deltaTime * rotationSpeed);
-        cameraTransform.localRotation = Quaternion.Euler(Vector3.right * bodyAngle);
+            transform.Rotate(Vector3.up * deltaX * Time.deltaTime * rotationSpeed);
+            cameraTransform.localRotation = Quaternion.Euler(Vector3.right * bodyAngle);
+        }
+    }
+
+    public void SetCanMoveCam(bool newState)
+    {
+        canMoveCam = newState;
     }
 
     //On Client

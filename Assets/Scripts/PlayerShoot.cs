@@ -15,7 +15,7 @@ public class PlayerShoot : NetworkBehaviour
 
     public PlayerAnimationReplication AnimationReplication = null;
 
-    public Animator animator = null;
+    public Animator fpsAnimator = null;
 
     private Player player = null;
 
@@ -77,7 +77,7 @@ public class PlayerShoot : NetworkBehaviour
             if (weaponData.currentMagazineSize == 0)
             {
                 reloading = true;
-                animator.SetTrigger("Reload");
+                fpsAnimator.SetTrigger("Reload");
                 AnimationReplication.UpdateReload();
             }
         }

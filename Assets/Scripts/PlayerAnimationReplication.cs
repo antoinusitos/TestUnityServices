@@ -20,6 +20,9 @@ public class PlayerAnimationReplication : NetworkBehaviour
     public NetworkVariable<bool> currentCrouch = new NetworkVariable<bool>(NetworkVariableReadPermission.Everyone, false);
     private bool crouch = false;
 
+    public NetworkVariable<bool> currentDeath = new NetworkVariable<bool>(NetworkVariableReadPermission.Everyone, false);
+    private bool death = false;
+
     private void Update()
     {
         if(IsServer)
@@ -124,6 +127,27 @@ public class PlayerAnimationReplication : NetworkBehaviour
     private void UpdateCrouchServerRPC(bool c)
     {
         currentCrouch.Value = c;
+    }
+
+    public void UpdateDeath(bool d)
+    {
+        bool shouldUpdate = false;
+        if (d != death)
+        {
+            death = d;
+            shouldUpdate = true;
+        }
+
+        if (shouldUpdate)
+        {
+            UpdateDeathServerRPC(death);
+        }
+    }
+
+    [ServerRpc]
+    private void UpdateDeathServerRPC(bool d)
+    {
+        currentDeath.Value = d;
     }
 
     public void UpdateReload()
