@@ -7,4 +7,3 @@ To Do List :
 - prediction
 - doors
 - died cam on teammate
-- died cam
