@@ -7,3 +7,4 @@ To Do List :
 - prediction
 - doors
 - died cam on teammate
+- change team and weapon during game
