@@ -11,3 +11,4 @@ Optional :
 - doors
 - game mode
 - prediction
+- show game info on server
