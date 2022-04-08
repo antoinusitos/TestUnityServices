@@ -1,9 +1,13 @@
 # TestUnityServices
 
 To Do List : 
-- jump
+- finish jump (layer instead of tags)
 - sounds
 - change team and weapon during game
+- end of game / switch map
+- return to main menu
+- loading screen (async load?)
+- check lean bug
 
 Optional :
 - Server command
