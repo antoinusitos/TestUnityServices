@@ -7,6 +7,7 @@
 Doing:
 - finish jump (layer instead of tags)
 - change team and weapon during game
+- Rework humanoid animations
 
 To Do List : 
 - sounds
